@@ -13,14 +13,16 @@ app.get("/", (req,res) => {
 })
 
 app.post('/payment_sheet', async (req, res) => {
+  const {amount,currency} = req.body;
+  
   const customer = await stripe.customers.create();
   const ephemeralKey = await stripe.ephemeralKeys.create(
     {customer: customer.id},
     {apiVersion: '2022-11-15'}
   );
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: 1099,
-    currency: 'eur',
+    amount: amount,
+    currency: currency,
     customer: customer.id,
     automatic_payment_methods: {
       enabled: true,
@@ -31,6 +33,8 @@ app.post('/payment_sheet', async (req, res) => {
     paymentIntent: paymentIntent.client_secret,
     ephemeralKey: ephemeralKey.secret,
     customer: customer.id,
+    amount: amount,
+    currency: currency
   });
 });
 
